@@ -42,7 +42,7 @@ int	main(void)
 
 		/*
 		 * (X == 0 || X != 0) is always true, so the password value is
-		 * irrelevant -- what matters is that fgets already overflowed.
+		 * irrelevant - what matters is that fgets already overflowed.
 		 */
 		if (verify_user_pass(pass_field) == 0 || verify_user_pass(pass_field) != 0)
 			puts("nope, incorrect password...\n");
