@@ -28,11 +28,11 @@ it to gain the next user's privileges, and read that user's password.
 
 Each level directory contains:
 
-- `walkthrough.md` — the practical procedure, commands and explanations for evaluation;
-- `concepts.md` — the background theory behind the level (the *why*, not expanded in the walkthrough);
-- `source.c` — a reconstructed, commented pseudo-source of the binary;
-- `flag` — the password obtained for the next user;
-- `Ressources/` — a helper program, when one is genuinely useful (levels 05, 06).
+- `walkthrough.md` - the practical procedure, commands and explanations for evaluation;
+- `concepts.md` - the background theory behind the level (the *why*, not expanded in the walkthrough);
+- `source.c` - a reconstructed, commented pseudo-source of the binary;
+- `flag` - the password obtained for the next user;
+- `Ressources/` - a helper program, when one is genuinely useful (levels 05, 06).
 
 No binaries are stored here (per the project rules); everything is proven live on the VM
 during evaluation.

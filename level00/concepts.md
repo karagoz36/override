@@ -1,6 +1,6 @@
-# Level 00 — Concepts
+# Level 00 - Concepts
 
-> 💡 **Core idea:** an SUID binary runs with its *owner's* rights — make it hand you a shell.
+> 💡 **Core idea:** an SUID binary runs with its *owner's* rights - make it hand you a shell.
 > 🧩 **New here:** SUID, reading one branch in the disassembly, hex ↔ decimal.
 > 🎯 **Goal of the level:** pass a hard-coded integer check to reach `system("/bin/sh")`.
 
@@ -10,7 +10,7 @@ The walkthrough shows *what to do*; this file explains *why it works*.
 
 ## 📖 What is SUID?
 
-A file can carry the **SUID bit** — shown as an `s` where the owner's `x` would be in
+A file can carry the **SUID bit** - shown as an `s` where the owner's `x` would be in
 `ls -l`:
 
 ```
@@ -22,14 +22,14 @@ A file can carry the **SUID bit** — shown as an `s` where the owner's `x` woul
 When you run an SUID binary, it executes with the **owner's** privileges, not yours. `level00`
 is owned by `level01`, so any shell it spawns is a `level01` shell.
 
-> 🧠 **Why this matters:** this is the engine of the *whole* project — every level is "make an
+> 🧠 **Why this matters:** this is the engine of the *whole* project - every level is "make an
 > SUID binary owned by the next user spawn a shell, then read their `.pass`."
 
 ---
 
 ## ⚙️ How the check works
 
-The program reads an integer and compares it to a fixed value. No memory corruption — pure
+The program reads an integer and compares it to a fixed value. No memory corruption - pure
 logic:
 
 ```c
@@ -62,7 +62,7 @@ jne    <reject>         ; branch away if they differ
 ## 🧠 Why a shell instead of "just print the pass"
 
 `system("/bin/sh")` starts a shell, and because the process is still SUID `level01`, that
-shell has `level01`'s rights. From it you `cat` `level01`'s `.pass` — a file your own account
+shell has `level01`'s rights. From it you `cat` `level01`'s `.pass` - a file your own account
 can't read.
 
 ---

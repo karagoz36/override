@@ -1,4 +1,4 @@
-# Level 00 — Practical walkthrough
+# Level 00 - Practical walkthrough
 
 > 🔓 **Flaw:** SUID binary + hard-coded magic password
 > 🎯 **Target:** the `password == 5276` check

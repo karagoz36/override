@@ -1,8 +1,8 @@
-# Level 01 — Practical walkthrough
+# Level 01 - Practical walkthrough
 
 > 🔓 **Flaw:** stack buffer overflow (`fgets` reads 100 bytes into a 64-byte buffer)
 > 🎯 **Target:** the saved return address (EIP) of `main`
-> 🛠️ **Technique:** ret2libc (return-to-libc) — jump to `system("/bin/sh")`.
+> 🛠️ **Technique:** ret2libc (return-to-libc) - jump to `system("/bin/sh")`.
 
 All commands are run as user `level01`.
 
@@ -51,7 +51,7 @@ disassemble verify_user_name
 disassemble verify_user_pass
 ```
 
-`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — that
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) - that
 is how we discover `verify_user_name` and `verify_user_pass` and know to disassemble them.
 Their names also show up on the `call ... <name>` lines inside `main`.
 
@@ -72,7 +72,7 @@ run
 ```
 
 🟨 **In the program**, type only the value at each prompt (the `Enter ...:` text is printed
-by the program — don't type it):
+by the program - don't type it):
 
 - at `Enter Username:` type `dat_wil`
 - at `Enter Password:` paste the cyclic pattern below
@@ -110,7 +110,7 @@ So **80 bytes** of padding land exactly on the saved return address.
 
 ## 4. Find the libc addresses
 
-🟦 **Goal:** collect the addresses needed for ret2libc — `system`, `exit`, and the string
+🟦 **Goal:** collect the addresses needed for ret2libc - `system`, `exit`, and the string
 `"/bin/sh"` (all live inside libc, mapped into the process).
 
 🟨 **GDB:**
@@ -169,7 +169,7 @@ the spawned shell stays interactive.
 ```
 
 Without `exit` you must still keep a 4-byte placeholder in `system`'s return slot (here
-`BBBB`) — deleting it would shift `"/bin/sh"` out of the argument position. This variant opens
+`BBBB`) - deleting it would shift `"/bin/sh"` out of the argument position. This variant opens
 the shell just as well; it only segfaults *after* you leave the shell:
 
 ```bash

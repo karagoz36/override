@@ -1,4 +1,4 @@
-# Level 09 — Practical walkthrough (bonus)
+# Level 09 - Practical walkthrough (bonus)
 
 > 🔓 **Flaw:** off-by-one in the username copy, which corrupts the message length field
 > 🎯 **Target:** the saved return address (RSP) of `handle_msg`, redirected to `secret_backdoor()`
@@ -51,16 +51,16 @@ disassemble set_msg
 print secret_backdoor
 ```
 
-`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — this is
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) - this is
 how we spot the hidden `secret_backdoor` (never called by the program) plus `set_username`,
 `set_msg` and `handle_msg`.
 
 Findings:
 
-- A hidden `secret_backdoor()` reads a line and runs it via `system()` — our goal is to jump
+- A hidden `secret_backdoor()` reads a line and runs it via `system()` - our goal is to jump
   there and type `/bin/sh`.
 - The struct is `{ char message_body[140]; char sender[40]; int body_len; }`.
-- `set_username` copies with `i <= 40` — an **off-by-one** that writes 41 bytes, the 41st
+- `set_username` copies with `i <= 40` - an **off-by-one** that writes 41 bytes, the 41st
   landing in `body_len` (right after the 40-byte sender field).
 - `set_msg` does `strncpy(message_body, buffer, body_len)`. If we inflate `body_len`, this
   copy overflows `message_body[140]` and reaches the saved return address.
@@ -126,13 +126,13 @@ x/s $rsp
 0x7fffffffe588:  "6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah"
 ```
 
-That substring sits at offset **200** in the pattern — so 200 bytes of message reach the
+That substring sits at offset **200** in the pattern - so 200 bytes of message reach the
 return address.
 
 ## 5. Build and run the exploit
 
-🟦 **Goal:** assemble both inputs — username (40 + `\xff`) and message (200 padding +
-`&secret_backdoor`) — then send `/bin/sh` to the backdoor's `fgets`.
+🟦 **Goal:** assemble both inputs - username (40 + `\xff`) and message (200 padding +
+`&secret_backdoor`) - then send `/bin/sh` to the backdoor's `fgets`.
 
 ```text
 username = "A"*40 + "\xff"
@@ -186,5 +186,5 @@ end
 GG !
 ```
 
-Good game — the obligatory levels plus the bonus are complete. (Becoming `root` is
+Good game - the obligatory levels plus the bonus are complete. (Becoming `root` is
 out of scope and counts as cheating.)

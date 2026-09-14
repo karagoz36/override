@@ -1,4 +1,4 @@
-# Level 03 — Practical walkthrough
+# Level 03 - Practical walkthrough
 
 > 🔓 **Flaw:** weak XOR "encryption" of the password check
 > 🎯 **Target:** the key that decrypts the ciphertext to `"Congratulations"`
@@ -50,7 +50,7 @@ disassemble test
 disassemble decrypt
 ```
 
-`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — that is
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) - that is
 how we discover `test` and `decrypt` and know to disassemble them. Their names also appear on
 the `call ... <name>` lines inside `main`.
 
@@ -58,11 +58,11 @@ Reconstructing the flow:
 
 - `main` reads an integer `input` and calls `test(input, 322424845)`.
 - `test` derives `key = 322424845 - input`. Only a small set of keys is accepted (a `switch`,
-  covering 1–9 and 16–21); any other key decrypts with a **random** byte — a dead end.
+  covering 1-9 and 16-21); any other key decrypts with a **random** byte - a dead end.
 - `decrypt(key)` XORs the fixed ciphertext `"Q}|u`sfg~sf{}|a3"` byte-by-byte with `key`,
   and if the result equals `"Congratulations"` it calls `system("/bin/sh")`.
 
-So we need the single-byte `key` (0–21) such that `ciphertext ^ key == "Congratulations"`.
+So we need the single-byte `key` (0-21) such that `ciphertext ^ key == "Congratulations"`.
 
 ## 3. Recover the key
 
@@ -95,7 +95,7 @@ python -c "print(''.join(chr(ord(c) ^ 18) for c in 'Q}|u\x60sfg~sf{}|a3'))"
 Congratulations!
 ```
 
-`key = 18`. (18 is in the accepted 16–21 range, so `test` uses our key, not the random path.)
+`key = 18`. (18 is in the accepted 16-21 range, so `test` uses our key, not the random path.)
 
 ## 4. Invert the arithmetic
 

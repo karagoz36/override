@@ -1,4 +1,4 @@
-# Level 06 — Practical walkthrough
+# Level 06 - Practical walkthrough
 
 > 🔓 **Flaw:** deterministic, reversible hash used as a "serial" check
 > 🎯 **Target:** the `serial == hash(login)` test inside `auth()`
@@ -49,7 +49,7 @@ disassemble main
 disassemble auth
 ```
 
-`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — that is
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) - that is
 how we discover `auth` and know to disassemble it. Its name also appears on the
 `call ... <auth>` line inside `main`.
 
@@ -64,7 +64,7 @@ Reconstructing `auth(login, serial)`:
   modulo 1337.
 - Succeeds only if `serial == hash`, then `main` runs `system("/bin/sh")`.
 
-The hash depends only on the login, so we compute it ourselves — no runtime tampering needed.
+The hash depends only on the login, so we compute it ourselves - no runtime tampering needed.
 
 ## 3. Compute a valid serial
 

@@ -1,8 +1,8 @@
-# Level 04 — Practical walkthrough
+# Level 04 - Practical walkthrough
 
 > 🔓 **Flaw:** `gets()` stack overflow in a `ptrace`-guarded child
 > 🎯 **Target:** the saved return address (EIP) of the child's `main`
-> 🛠️ **Technique:** ret2libc — the parent's `ptrace` blocks `execve`, so we call `system("/bin/sh")`, whose grandchild does the exec unseen.
+> 🛠️ **Technique:** ret2libc - the parent's `ptrace` blocks `execve`, so we call `system("/bin/sh")`, whose grandchild does the exec unseen.
 
 All commands are run as user `level04`. This binary is **32-bit** (libc addresses are
 the same ones we used in level01).
@@ -47,13 +47,13 @@ disassemble main
 
 Reconstructing `main`:
 
-- It `fork`s. The **child** runs `gets(buffer)` — an unbounded read into a 32-byte buffer.
+- It `fork`s. The **child** runs `gets(buffer)` - an unbounded read into a 32-byte buffer.
 - The **parent** loops on `ptrace(PTRACE_PEEKUSR, child, 44, 0)`, reading the child's
   `ORIG_EAX` (the attempted syscall number). If it ever equals **11** (`execve`), the parent
   prints `no exec() for you` and kills the child.
 
 So injecting execve shellcode is caught. Instead we return into libc: `system("/bin/sh")`
-internally `fork`s a **grandchild** that performs the exec — and the parent only traces our
+internally `fork`s a **grandchild** that performs the exec - and the parent only traces our
 direct child, not the grandchild.
 
 ## 3. Find the EIP offset

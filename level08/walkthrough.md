@@ -1,4 +1,4 @@
-# Level 08 — Practical walkthrough
+# Level 08 - Practical walkthrough
 
 > 🔓 **Flaw:** the backup tool opens the source file with `level09`'s rights and copies it somewhere we can read
 > 🎯 **Target:** `/home/users/level09/.pass`
@@ -61,7 +61,7 @@ info functions
 disassemble main
 ```
 
-`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — here it
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) - here it
 reveals `log_wrapper` alongside `main`. The names also appear on the `call ... <name>` lines
 inside `main`.
 
@@ -70,7 +70,7 @@ Reconstructing `main`:
 - Opens `argv[1]` for reading with **`level09`'s rights** (it's SUID).
 - Builds the destination as `"./backups/" + argv[1]` and copies the bytes there.
 
-So passing an absolute path fails — the prefix mangles it into `./backups//home/...`:
+So passing an absolute path fails - the prefix mangles it into `./backups//home/...`:
 
 🟨 **Terminal:**
 

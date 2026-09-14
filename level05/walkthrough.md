@@ -1,11 +1,11 @@
-# Level 05 — Practical walkthrough
+# Level 05 - Practical walkthrough
 
-> 🔓 **Flaw:** format-string bug — `printf(buffer)` with no format specifier, plus `exit(0)`
+> 🔓 **Flaw:** format-string bug - `printf(buffer)` with no format specifier, plus `exit(0)`
 > 🎯 **Target:** `exit@GOT` (Global Offset Table entry for `exit`)
 > 🛠️ **Technique:** put shellcode in an env var (NX-safe), then use `%hn` short writes to overwrite `exit@GOT` with its address.
 
 All commands are run as user `level05`. This binary is **32-bit** with **NX enabled**, so
-stack shellcode won't execute — we redirect `exit` into an env-var shellcode instead.
+stack shellcode won't execute - we redirect `exit` into an env-var shellcode instead.
 
 ## 1. Observe the program
 
@@ -113,7 +113,7 @@ python -c 'print "AAAA" + " %x"*12' | ./level05
 aaaa 64 f7fcfac0 f7ec3af9 ... 61616161 ...
 ```
 
-`61616161` (`"aaaa"` — our uppercased "AAAA" comes back lowercased) shows up at the **10th**
+`61616161` (`"aaaa"` - our uppercased "AAAA" comes back lowercased) shows up at the **10th**
 argument, so the two halves of our address will be written via `%10$hn` and `%11$hn`.
 
 ## 5. Compute the short writes

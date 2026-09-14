@@ -1,16 +1,16 @@
-# Level 08 — Concepts
+# Level 08 - Concepts
 
-> 💡 **Core idea:** a SUID backup tool reads any file you name with the *owner's* rights — point
+> 💡 **Core idea:** a SUID backup tool reads any file you name with the *owner's* rights - point
 > it (via a symlink) at the protected `.pass` and it copies the secret somewhere you can read.
 > 🧩 **New here:** SUID + filesystem privilege abuse, symlinks.
-> 🎯 **Goal:** no memory corruption — a pure logic/filesystem bug.
+> 🎯 **Goal:** no memory corruption - a pure logic/filesystem bug.
 
 ---
 
 ## 🔑 SUID + file access = read anything the owner can
 
 The binary is SUID `level09`, so `fopen(argv[1], "r")` opens the file with **`level09`'s
-rights**. It will read any file `level09` can — including `/home/users/level09/.pass` — and copy
+rights**. It will read any file `level09` can - including `/home/users/level09/.pass` - and copy
 the bytes somewhere we control.
 
 > 🧠 The bug isn't in memory: a *privileged* program reads an *attacker-named* file and hands us
@@ -56,12 +56,12 @@ cat backups/password
 [level02](../level02/concepts.md)/[level05](../level05/concepts.md)). It's exploitable, but the
 symlink route is far simpler.
 
-> ⚠️ Worth recognising the bug class even when you don't use it — graders may ask.
+> ⚠️ Worth recognising the bug class even when you don't use it - graders may ask.
 
 ---
 
 ## 🔑 Takeaway
 
 A privileged program that opens an attacker-named file can be aimed, via a symlink, at a file
-you can't read — it does the reading with its own rights and drops the result somewhere you can
+you can't read - it does the reading with its own rights and drops the result somewhere you can
 reach. Watch for **SUID + attacker-controlled paths**.

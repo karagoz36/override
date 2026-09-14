@@ -1,12 +1,12 @@
-# Level 05 — Concepts
+# Level 05 - Concepts
 
 > 💡 **Core idea:** stash shellcode in an env var (where it *can* run), then use a format-string
-> `%hn` write to point `exit@GOT` at it — so the program's own `exit(0)` jumps to our shellcode.
+> `%hn` write to point `exit@GOT` at it - so the program's own `exit(0)` jumps to our shellcode.
 > 🧩 **New here:** env-var shellcode, NOP sled, **PLT/GOT**, `%n`/`%hn` writes, short writes.
 > 🔗 **Builds on:** [level02](../level02/concepts.md) (format strings),
 > [level01](../level01/concepts.md) (NX).
 
-This is the most machinery-heavy level — take it in pieces.
+This is the most machinery-heavy level - take it in pieces.
 
 ---
 
@@ -68,14 +68,14 @@ target 0xffffd832  ->  low 0xd832 = 55346 , high 0xffff = 65535
 %hn write #2 -> exit@GOT + 2  (high half)
 ```
 
-The width fields (`%55338d`, `%10189d`) pad the output so the running count equals each half —
+The width fields (`%55338d`, `%10189d`) pad the output so the running count equals each half -
 subtracting the bytes already printed (the 8 front-loaded address bytes, then the first half).
 
 ---
 
 ## 🔡 The tolower quirk
 
-The program lowercases uppercase letters (`0x41`–`0x5a`) before printing. Our address bytes and
+The program lowercases uppercase letters (`0x41`-`0x5a`) before printing. Our address bytes and
 format specifiers are never uppercase ASCII, so they survive untouched.
 
 ---

@@ -1,10 +1,10 @@
-# Level 03 — Concepts
+# Level 03 - Concepts
 
-> 💡 **Core idea:** the "encryption" guarding the check is reversible XOR — one known byte hands
+> 💡 **Core idea:** the "encryption" guarding the check is reversible XOR - one known byte hands
 > you the key, then you invert the arithmetic to get the input.
 > 🧩 **New here:** XOR reversibility, known-plaintext attacks, switch/jump tables,
 > magic-number division.
-> 🎯 **Goal:** no memory corruption — pure reverse engineering.
+> 🎯 **Goal:** no memory corruption - pure reverse engineering.
 
 ---
 
@@ -51,8 +51,8 @@ input = 322424845 - key = 322424845 - 18 = 322424827
 
 ## 🧩 Switch / jump tables
 
-The real control flow is a **switch**, not a simple `if`. Only specific keys are accepted (1–9
-and 16–21); any other key decrypts with `rand()` — a dead end. Our key 18 is in range.
+The real control flow is a **switch**, not a simple `if`. Only specific keys are accepted (1-9
+and 16-21); any other key decrypts with `rand()` - a dead end. Our key 18 is in range.
 
 > 🔍 **In the disassembly** a switch usually looks like a bounds check plus an indirect jump
 > through a table of addresses.
@@ -64,7 +64,7 @@ and 16–21); any other key decrypts with `rand()` — a dead end. Our key 18 is
 Compilers rarely emit a real `div` for `%` or `/`. Instead you'll see a multiply by a weird
 constant plus shifts (**reciprocal multiplication**).
 
-> ⚠️ Don't trace every instruction — recognise the pattern and read it as the modulo/division it
+> ⚠️ Don't trace every instruction - recognise the pattern and read it as the modulo/division it
 > implements. (This same trick returns in [level06](../level06/concepts.md).)
 
 ---
@@ -72,7 +72,7 @@ constant plus shifts (**reciprocal multiplication**).
 ## 🎲 rand / srand
 
 `srand(time(0))` seeds the PRNG from the clock; the wrong-key branch calls `rand()`. That path
-is deliberately unpredictable, so brute-forcing decryption is pointless — derive the one correct
+is deliberately unpredictable, so brute-forcing decryption is pointless - derive the one correct
 key instead.
 
 ---

@@ -1,7 +1,7 @@
-# Level 09 — Concepts
+# Level 09 - Concepts
 
 > 💡 **Core idea:** a single off-by-one byte, positioned by struct layout onto a length field,
-> escalates into a full overflow of a *later* copy — redirect the 64-bit return to a hidden
+> escalates into a full overflow of a *later* copy - redirect the 64-bit return to a hidden
 > `system`-calling function.
 > 🧩 **New here:** off-by-one, struct field adjacency, 64-bit return overwrite, hidden "win"
 > function, PIE/ASLR.
@@ -11,7 +11,7 @@
 
 ## ➕ Off-by-one errors
 
-A loop bound of `i <= 40` instead of `i < 40` copies **41** bytes into a 40-byte field — one
+A loop bound of `i <= 40` instead of `i < 40` copies **41** bytes into a 40-byte field - one
 byte too many. That single extra byte is the whole vulnerability.
 
 ---
@@ -53,7 +53,7 @@ Same idea as level01 (overwrite the saved return address), but 64-bit:
 
 - the instruction pointer is `RIP`; the return slot is read via `RSP`;
 - addresses are 8 bytes;
-- find the offset (**200**) the same way — cyclic pattern, then `x/s $rsp` at the crash.
+- find the offset (**200**) the same way - cyclic pattern, then `x/s $rsp` at the crash.
 
 ---
 
@@ -64,9 +64,9 @@ info functions   ->   secret_backdoor   (defined but never called)
 ```
 
 `secret_backdoor` reads a line and runs it through `system()`. So no ret2libc or shellcode
-needed — overwrite the return address with its address, and when it runs, type `/bin/sh`.
+needed - overwrite the return address with its address, and when it runs, type `/bin/sh`.
 
-> 🧠 **Always scan for functions the program *defines but never calls*** — they're often the
+> 🧠 **Always scan for functions the program *defines but never calls*** - they're often the
 > intended target.
 
 ---
@@ -74,7 +74,7 @@ needed — overwrite the return address with its address, and when it runs, type
 ## 🎲 PIE / ASLR note
 
 The binary is **PIE** (addresses look like `0x5555...`). On the VM ASLR is effectively off, so
-the address is stable — read it once with `print secret_backdoor` and reuse it.
+the address is stable - read it once with `print secret_backdoor` and reuse it.
 
 > ⚠️ Under real ASLR you'd need an info leak first to defeat randomisation.
 

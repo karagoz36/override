@@ -1,6 +1,6 @@
-# Level 04 — Concepts
+# Level 04 - Concepts
 
-> 💡 **Core idea:** a `gets()` overflow guarded by a `ptrace` watchdog that kills `execve` — but
+> 💡 **Core idea:** a `gets()` overflow guarded by a `ptrace` watchdog that kills `execve` - but
 > `system` runs the exec in an untraced *grandchild*, so ret2libc slips through.
 > 🧩 **New here:** `fork`, `ptrace` anti-exec, syscall numbers, follow-fork-mode.
 > 🔗 **Builds on:** [level01](../level01/concepts.md) (overflow, offset, ret2libc).
@@ -20,10 +20,10 @@ Here the **child** runs the vulnerable `gets()`; the **parent** stays behind to 
 
 ---
 
-## 💥 gets() — the overflow
+## 💥 gets() - the overflow
 
 `gets(buf)` reads a line with **no size limit whatsoever** (there is no safe way to call it).
-Into a 32-byte buffer, it's the same overflow as level01 — smash past the buffer, overwrite the
+Into a 32-byte buffer, it's the same overflow as level01 - smash past the buffer, overwrite the
 saved return address, control EIP.
 
 > 📏 The offset here is **156**. (See [level01](../level01/concepts.md) for the
@@ -41,7 +41,7 @@ parent:  ptrace(PTRACE_PEEKUSR, child, 44, 0)  read child's ORIG_EAX (attempted 
          if that number == 11 (execve) -> "no exec() for you", kill child
 ```
 
-> 📖 **Offset 44** in the child's user area is **`ORIG_EAX`** — the number of the syscall it just
+> 📖 **Offset 44** in the child's user area is **`ORIG_EAX`** - the number of the syscall it just
 > attempted. **Syscall 11 = `execve`.**
 
 So any shellcode that calls `execve("/bin/sh")` is caught and killed. Injecting exec shellcode

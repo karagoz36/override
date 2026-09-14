@@ -1,6 +1,6 @@
-# Level 06 — Concepts
+# Level 06 - Concepts
 
-> 💡 **Core idea:** the "serial" is a deterministic function of the login — reimplement it and
+> 💡 **Core idea:** the "serial" is a deterministic function of the login - reimplement it and
 > compute a valid serial yourself, sidestepping the anti-debug guard and the stack canary.
 > 🧩 **New here:** reimplementing an algorithm offline, `ptrace` anti-debug, stack canaries.
 > 🔗 **Builds on:** [level03](../level03/concepts.md) (deterministic reversing, magic-number
@@ -11,7 +11,7 @@
 ## 🎯 The check is a pure function of the login
 
 `auth()` hashes the login and requires `serial == hash`. Nothing random is involved, so the
-serial is a **deterministic function** of the login — computable offline. No runtime tricks
+serial is a **deterministic function** of the login - computable offline. No runtime tricks
 needed.
 
 ---
@@ -51,11 +51,11 @@ The code uses this to print `TAMPERING DETECTED` when a debugger is attached. Tw
 it:
 
 - patch the return in gdb (`set $eax = 0` at the check), **or**
-- 🟢 simpler: never attach a debugger — compute the serial offline.
+- 🟢 simpler: never attach a debugger - compute the serial offline.
 
 ---
 
-## 🐤 Stack canary — why not overflow?
+## 🐤 Stack canary - why not overflow?
 
 The disassembly shows a **stack canary**:
 
@@ -75,5 +75,5 @@ call __stack_chk_fail   ; abort if it changed
 ## 🔑 Takeaway
 
 When a program validates input with a deterministic, self-contained computation, reimplement
-that computation and produce a valid input — bypassing anti-debug guards and stack canaries
+that computation and produce a valid input - bypassing anti-debug guards and stack canaries
 entirely.

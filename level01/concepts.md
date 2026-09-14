@@ -1,4 +1,4 @@
-# Level 01 — Concepts
+# Level 01 - Concepts
 
 > 💡 **Core idea:** overflow a buffer to overwrite the saved return address, then (because NX
 > blocks stack shellcode) redirect execution into libc's `system("/bin/sh")`.
@@ -6,7 +6,7 @@
 > offset, NX, **ret2libc**.
 > 🔗 **Builds on:** [level00](../level00/concepts.md) (SUID).
 
-This is the big one — the chain here recurs in almost every later level.
+This is the big one - the chain here recurs in almost every later level.
 
 ---
 
@@ -22,13 +22,13 @@ The binary has **no debugging symbols** (no variable names, types, or line numbe
 | `x/s <addr>` | the string at an address (e.g. `"dat_wil"`, `"admin"`) |
 
 > ⚠️ **Variable names are yours to infer.** The binary only has addresses. You name a buffer by
-> what it *does* — the thing `fgets` fills and that gets compared to `"dat_wil"` is "username".
+> what it *does* - the thing `fgets` fills and that gets compared to `"dat_wil"` is "username".
 
 ---
 
 ## 🧱 2. The stack, registers, and `ret`
 
-Each function call gets a **stack frame** — laid out (high → low address) as:
+Each function call gets a **stack frame** - laid out (high → low address) as:
 
 ```
    arguments
@@ -41,7 +41,7 @@ Registers (32-bit):
 
 | Reg | Meaning |
 | --- | --- |
-| **EIP** | address of the next instruction — *control this = control the program* |
+| **EIP** | address of the next instruction - *control this = control the program* |
 | **ESP** | top of the stack |
 | **EBP** | base of the frame (locals addressed from it) |
 | **EAX** | return value / scratch |
@@ -50,7 +50,7 @@ Registers (32-bit):
 > `esp+0x1c` into `eax` (a buffer pointer).
 >
 > 📖 **`ret`** pops 4 bytes off the top of the stack into `EIP` and jumps there. Normally that's
-> the real return address — but we're about to replace it.
+> the real return address - but we're about to replace it.
 
 ---
 
@@ -83,12 +83,12 @@ So **80 bytes** of padding, then the next 4 bytes are `EIP`.
 
 ---
 
-## 🛡️ 5. NX — why we can't run our own shellcode
+## 🛡️ 5. NX - why we can't run our own shellcode
 
 > In RainFall you wrote shellcode into a buffer and jumped to it.
 
 Here the **NX (No-eXecute)** bit marks the stack non-executable: the CPU refuses to run
-instructions located on the stack. Stack shellcode just faults. So we can't run *our* code — we
+instructions located on the stack. Stack shellcode just faults. So we can't run *our* code - we
 must reuse code that already lives in an executable region.
 
 ---
@@ -112,12 +112,12 @@ So after the padding we lay down a fake frame:
 ```
 
 - Addresses are **little-endian**: `system` at `0xf7e6aed0` → `\xd0\xae\xe6\xf7`.
-- `find &system, +9999999, "/bin/sh"` locates the ready-made string *inside* libc — no need to
+- `find &system, +9999999, "/bin/sh"` locates the ready-made string *inside* libc - no need to
   inject it.
 
 > ⚠️ **`exit` is optional but its slot isn't.** `exit` just makes the program end cleanly instead
 > of segfaulting when the shell exits. You may replace it with any 4-byte placeholder (`BBBB`),
-> but you can't *delete* it — that would shift `"/bin/sh"` out of the argument position.
+> but you can't *delete* it - that would shift `"/bin/sh"` out of the argument position.
 
 ---
 

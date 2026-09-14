@@ -1,4 +1,4 @@
-# Level 07 — Practical walkthrough
+# Level 07 - Practical walkthrough
 
 > 🔓 **Flaw:** unbounded `tab[index]` write into an on-stack array (no bounds check)
 > 🎯 **Target:** the saved return address (EIP) of `main`, at table index 114
@@ -50,13 +50,13 @@ disassemble main
 disassemble store_number
 ```
 
-`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — that is
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) - that is
 how we discover `store_number`, `read_number`, `get_unum` and `clear_stdin`. Their names also
 appear on the `call ... <name>` lines inside `main`.
 
 Key facts:
 
-- `main` wipes `argv` and `env` — so we can't hide shellcode there.
+- `main` wipes `argv` and `env` - so we can't hide shellcode there.
 - `store_number` does `tab[index] = input` with **no bounds check** on `index`. `tab` is a
   100-int array on the **stack**, so an out-of-range index writes elsewhere on the stack,
   including `main`'s saved return address.
