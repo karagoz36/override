@@ -1,44 +1,73 @@
 # Level 00 — Concepts
 
-Background theory behind this level. The walkthrough shows *what to do*; this file explains
-*why it works*.
+> 💡 **Core idea:** an SUID binary runs with its *owner's* rights — make it hand you a shell.
+> 🧩 **New here:** SUID, reading one branch in the disassembly, hex ↔ decimal.
+> 🎯 **Goal of the level:** pass a hard-coded integer check to reach `system("/bin/sh")`.
 
-## SUID binaries
+The walkthrough shows *what to do*; this file explains *why it works*.
 
-A file can carry the **SUID bit** (`-rwsr-xr-x`, the `s` where `x` would be). When such a
-binary is executed, it runs with the **owner's** privileges, not the caller's. Here `level00`
-is owned by `level01`, so any shell it spawns runs as `level01`. That is the whole point of
-the game: make an SUID binary spawn a shell so we inherit the next user's rights and read
-their `.pass`.
+---
 
-Spot it with `ls -l`: the `s` in the owner's execute position is the SUID bit.
+## 📖 What is SUID?
 
-## scanf and integer comparison
+A file can carry the **SUID bit** — shown as an `s` where the owner's `x` would be in
+`ls -l`:
 
-`scanf("%d", &x)` reads a signed decimal integer from stdin into `x`. The program then does a
-plain `if (x != 5276)`. There is no memory corruption here — it is pure logic. If you supply
-the exact value, you pass.
+```
+-rwsr-s---+ 1 level01 users 7280 ... level00
+   ^
+   this 's' = SUID
+```
 
-## Reading the check in gdb
+When you run an SUID binary, it executes with the **owner's** privileges, not yours. `level00`
+is owned by `level01`, so any shell it spawns is a `level01` shell.
 
-- `disassemble main` prints the assembly.
-- The decisive instruction is `cmp eax, 0x149c` followed by a conditional jump (`jne`). `cmp`
-  subtracts and sets flags; `jne` branches if the two values differ.
-- `eax` holds the integer we typed. So the program compares our input to `0x149c`.
+> 🧠 **Why this matters:** this is the engine of the *whole* project — every level is "make an
+> SUID binary owned by the next user spawn a shell, then read their `.pass`."
 
-## Hex vs decimal
+---
 
-Assembly shows constants in hexadecimal. `0x149c` = `5276` in decimal. Convert with
-`python -c "print(int('149c',16))"`. Since `scanf("%d")` expects decimal, we type `5276`.
+## ⚙️ How the check works
 
-## Why a shell, not just "print the pass"
+The program reads an integer and compares it to a fixed value. No memory corruption — pure
+logic:
 
-The binary calls `system("/bin/sh")`. `system` runs a command through a shell; because the
-process is still SUID `level01`, that shell has `level01`'s rights. From it we can `cat`
-`level01`'s `.pass`, which our own account could not read.
+```c
+scanf("%d", &pin);       // read a decimal integer
+if (pin != 5276) { ... reject ... }
+else { system("/bin/sh"); }
+```
 
-## Takeaway
+---
 
-Level00 teaches the *setup* for every later level: SUID → run as owner → get a shell → read
-the next `.pass`. No exploitation yet, just recognising the mechanism and reading one branch
-in the disassembly.
+## 🔍 Seeing it in gdb
+
+```
+disassemble main
+```
+
+The decisive lines:
+
+```
+cmp    eax, 0x149c      ; compare our input (in eax) to 0x149c
+jne    <reject>         ; branch away if they differ
+```
+
+- `cmp` subtracts and sets CPU flags; `jne` jumps if "not equal".
+- Assembly shows constants in **hex**. `0x149c` = `5276` decimal
+  (`python -c "print(int('149c',16))"`). Since `scanf("%d")` wants decimal, you type `5276`.
+
+---
+
+## 🧠 Why a shell instead of "just print the pass"
+
+`system("/bin/sh")` starts a shell, and because the process is still SUID `level01`, that
+shell has `level01`'s rights. From it you `cat` `level01`'s `.pass` — a file your own account
+can't read.
+
+---
+
+## 🔑 Takeaway
+
+SUID → runs as owner → get a shell → read the next `.pass`. No exploitation yet, just
+recognising the mechanism and reading a single `cmp`/`jne` branch.

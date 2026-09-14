@@ -1,53 +1,80 @@
 # Level 02 — Concepts
 
-Background theory behind this level. Level02 is 64-bit and introduces the **format-string**
-vulnerability used to *read* memory.
+> 💡 **Core idea:** `printf(user_input)` lets us aim `%`-specifiers at the process's own memory
+> and *read* the password the program loaded onto the stack.
+> 🧩 **New here:** the **format-string** bug, `%p`/`%N$p` reads, 64-bit differences, endian
+> decoding.
+> 🔗 **Builds on:** [level00](../level00/concepts.md)–[level01](../level01/concepts.md)
+> (gdb, the stack).
 
-## Why 64-bit matters here
+---
 
-Unlike level00/01 (32-bit), this binary is 64-bit: registers are `rax`/`rsp`/`rbp`, and each
-`%p` prints an 8-byte pointer. It also changes how function arguments are passed (first args go
-in registers `rdi, rsi, rdx, rcx, r8, r9`, then the stack), which affects *which* format
-argument index reaches your buffer.
+## 🧠 What is a format-string bug?
 
-## The format-string bug
+`printf` doesn't know how many arguments it really received — it **trusts the format string** to
+say. If *we* control the format string, every extra `%`-specifier makes `printf` fetch another
+"argument" that was never passed, walking registers and the stack.
 
-`printf(user_string)` with **no format specifier** is the bug. `printf` doesn't know how many
-arguments it was really given — it trusts the format string. If the format string is
-attacker-controlled, every `%`-specifier makes `printf` fetch and act on another "argument"
-that was never passed — i.e. it walks memory (registers then the stack).
+```c
+printf("%s", name);   // ✅ safe — name is data
+printf(name);         // ❌ bug — if name is "%p %p %p", printf leaks memory
+```
 
-Contrast:
-- `printf("%s", name)` — safe, `name` is data.
-- `printf(name)` — if `name` is `"%p %p %p"`, printf leaks three stack/register words.
+---
 
-## Reading the stack with `%p` / `%x`
+## 🖥️ Why 64-bit changes the details
 
-- `%p` prints the next argument as a pointer (hex). `%x` as a hex int.
-- Feeding `"AAAA %p %p %p ..."` dumps successive words; you'll see your own `AAAA`
-  (`0x41414141`) appear once you reach the buffer, which tells you *where you are* in the arg
-  list.
-- **Positional access**: `%N$p` prints the N-th argument directly, without printing 1..N-1.
-  That lets us jump straight to the words holding the password (`%22$p` … `%26$p`).
+This binary is 64-bit (`rax`/`rsp`/`rbp`), so:
 
-Here the program `fread`s level03's password onto the **stack** before printing, so the secret
-is sitting in those stack words waiting to be leaked.
+- each `%p` prints an **8-byte** pointer;
+- the first arguments come from **registers** (`rdi, rsi, rdx, rcx, r8, r9`), then the stack.
 
-## Decoding a leak (endianness)
+That shifts *which* positional index lands on your buffer/the password — hence the specific
+indices `%22$p … %26$p`.
 
-A leaked word like `0x48336750664b394d` is 8 bytes stored **little-endian**. To turn it back
-into text: write the hex, convert to raw bytes, and reverse. `xxd -r -p` does hex→bytes; `rev`
-reverses. Printing arguments high-index-first (`%26$p%25$p…%22$p`) lines the fragments up so
-the reconstructed string reads correctly.
+---
 
-## `%n` — reading vs writing
+## 🔍 Reading the stack
 
-`%p`/`%x` only *read*. The same bug can also *write*: `%n` stores "the number of chars printed
-so far" into an address argument. We don't need writing in level02 (reading the password is
-enough), but keep `%n` in mind — level05 uses it to overwrite a GOT entry.
+| Specifier | Effect |
+| --- | --- |
+| `%x` / `%p` | print the *next* argument (hex int / pointer) |
+| `%N$p` | print the **N-th** argument directly, skipping 1…N-1 |
 
-## Takeaway
+Feed `"AAAA %p %p %p ..."` and watch for your own `0x41414141` — that reveals where you are in
+the argument list. Then jump straight to the password words with positional access.
 
-An uncontrolled format string turns `printf` into a memory-reading (and, with `%n`, memory-
-writing) primitive. Here we use positional `%N$p` reads to leak a password the program had
-loaded onto the stack, then decode the little-endian words back to text.
+> 🧩 The program `fread`s level03's password **onto the stack** before printing, so the secret is
+> just sitting in those stack words, ready to leak.
+
+---
+
+## 🔡 Decoding a leak (endianness)
+
+A leaked word like `0x48336750664b394d` is 8 bytes stored **little-endian**. Turn it back into
+text:
+
+```
+hex  --xxd -r -p-->  raw bytes  --rev-->  readable
+```
+
+Printing the words high-index-first (`%26$p … %22$p`) lines the fragments up so the
+reconstruction reads in order.
+
+---
+
+## ✍️ `%n` — reading vs writing
+
+`%p`/`%x` only **read**. The same bug can **write**: `%n` stores "characters printed so far"
+into an address argument.
+
+> 🔗 We don't need writing here (reading the password is enough) — but remember `%n`: **level05**
+> uses it to overwrite a GOT entry.
+
+---
+
+## 🔑 Takeaway
+
+An uncontrolled format string turns `printf` into a memory **read** primitive (and, with `%n`, a
+**write** primitive). Here: positional `%N$p` reads leak a password the program left on the
+stack; decode the little-endian words back to text.

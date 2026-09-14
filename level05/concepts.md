@@ -1,62 +1,87 @@
 # Level 05 — Concepts
 
-Background theory behind this level. It combines a **format-string write** (`%n`) with a
-**GOT overwrite** and **env-var shellcode**. This is the most machinery-heavy level.
+> 💡 **Core idea:** stash shellcode in an env var (where it *can* run), then use a format-string
+> `%hn` write to point `exit@GOT` at it — so the program's own `exit(0)` jumps to our shellcode.
+> 🧩 **New here:** env-var shellcode, NOP sled, **PLT/GOT**, `%n`/`%hn` writes, short writes.
+> 🔗 **Builds on:** [level02](../level02/concepts.md) (format strings),
+> [level01](../level01/concepts.md) (NX).
 
-## NX recap — why the shellcode goes in an env var
+This is the most machinery-heavy level — take it in pieces.
 
-The stack is non-executable (NX), so shellcode on the stack won't run. But **environment
-variables** are copied onto the stack of the new process in a region that (on this VM) is still
-executable. So we stash `execve("/bin/sh")` shellcode in an env var and aim execution there.
+---
 
-### NOP sled
+## 🛡️ NX recap → put the shellcode in the environment
 
-Env addresses shift slightly depending on the environment, so we can't hit the shellcode's
-first byte exactly. We prefix it with a long run of `\x90` (**NOP** = "do nothing"). Landing
-anywhere in this sled just slides the CPU forward until it reaches the real shellcode. It turns
-a precise jump into an approximate one.
+The stack is non-executable, so stack shellcode won't run. But **environment variables** are
+copied into the new process in a region that (on this VM) is still executable. So we hide
+`execve("/bin/sh")` shellcode in an env var and aim execution there.
 
-## PLT and GOT
+### 🛬 NOP sled
 
-External functions (`printf`, `exit`, …) live in libc, whose address isn't known at link time.
-So the binary calls through two tables:
+Env addresses shift a little with the environment, so we can't hit the shellcode's first byte
+exactly. Prefix it with a long run of `\x90` (**NOP** = "do nothing"):
 
-- **PLT** (Procedure Linkage Table): a small stub per function, called by your code.
-- **GOT** (Global Offset Table): a table of *actual* resolved addresses. The PLT stub jumps to
+```
+[ \x90 \x90 \x90 ... \x90 ][ real shellcode ]
+        NOP sled              land anywhere in here and slide right ▶
+```
+
+It turns a precise jump into an approximate one.
+
+---
+
+## 🔗 PLT and GOT
+
+External functions live in libc, whose address isn't known at link time, so calls go through
+two tables:
+
+- **PLT** (Procedure Linkage Table): a small stub per function that *your* code calls.
+- **GOT** (Global Offset Table): the table of *resolved* real addresses. The PLT stub jumps to
   `*GOT[func]`.
 
-`x/i 0x8048370` on `exit@plt` shows `jmp *0x80497e0` → `0x080497e0` is **`exit@GOT`**. Crucially
-the GOT is **writable**. If we overwrite `exit@GOT` with our shellcode's address, then the
-program's final `exit(0)` jumps into our shellcode instead of libc's `exit`.
+```
+x/i 0x8048370        ; exit@plt
+=>  jmp  *0x80497e0   ; 0x080497e0 = exit@GOT   <-- writable!
+```
 
-## Format-string write with `%n`
+> 🎯 Overwrite `exit@GOT` with our shellcode's address, and the final `exit(0)` jumps to the
+> shellcode instead of libc's `exit`.
 
-`%n` writes "the number of characters printed so far" to the address given as that argument.
-Combined with the fact that our input buffer *is* on the stack (and is itself a format
-argument), we can:
+---
 
-1. Put the target address(es) at the start of the buffer.
-2. Use `%N$n` to write to them, where `N` is the buffer's argument index (found by leaking with
-   `%x`, here index 10).
+## ✍️ Format-string write with `%n`
 
-### Short writes (`%hn`)
+`%n` writes "characters printed so far" to the address given as that argument. Our input buffer
+*is* on the stack (and is itself an argument), so:
 
-A full 32-bit address as one `%n` would require printing billions of characters. `%hn` writes
-only **2 bytes** (a "short"). We split the target address into a low half and a high half and
-do two writes: one to `exit@GOT`, one to `exit@GOT+2`. The width fields (`%55338d`, `%10189d`)
-pad the output so the running character count equals each half's value. We subtract the bytes
-already printed (the 8 bytes of the two front addresses, then the first half) so the counts
-line up.
+1. put the target address(es) at the **start** of the buffer;
+2. use `%N$n`, where `N` is the buffer's argument index (found by leaking with `%x`; here **10**).
 
-## The tolower quirk
+### 🪓 Short writes (`%hn`)
 
-The program lowercases uppercase letters (`0x41`–`0x5a` XOR `0x20`) before printing. Our
-address bytes and format specifiers are never uppercase ASCII, so they pass through untouched —
-which is why the raw address bytes survive.
+Writing a full 32-bit address with one `%n` would mean printing billions of chars. `%hn` writes
+only **2 bytes**. So split the address into two halves and write twice:
 
-## Takeaway
+```
+target 0xffffd832  ->  low 0xd832 = 55346 , high 0xffff = 65535
+%hn write #1 -> exit@GOT      (low half)
+%hn write #2 -> exit@GOT + 2  (high half)
+```
 
-Put shellcode where it *can* execute (env var + NOP sled), then use the format-string `%hn`
-primitive to overwrite a writable **GOT** entry (`exit`) so the program's own `exit(0)` hands
-control to the shellcode. Learn PLT/GOT and short writes here — they're standard exploitation
-tools.
+The width fields (`%55338d`, `%10189d`) pad the output so the running count equals each half —
+subtracting the bytes already printed (the 8 front-loaded address bytes, then the first half).
+
+---
+
+## 🔡 The tolower quirk
+
+The program lowercases uppercase letters (`0x41`–`0x5a`) before printing. Our address bytes and
+format specifiers are never uppercase ASCII, so they survive untouched.
+
+---
+
+## 🔑 Takeaway
+
+Put the code where it *can* execute (env var + NOP sled), then use the format-string `%hn`
+primitive to overwrite a writable **GOT** entry (`exit`), so the program's own `exit(0)` hands
+control to your shellcode. PLT/GOT and short writes are standard tools from here on.
