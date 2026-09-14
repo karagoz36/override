@@ -122,11 +122,9 @@ That is `level03`'s password.
 su level03
 ```
 
-🟨 **In the program:**
+🟨 **At the `su` prompt** type only the value (`Password:` is printed by `su`):
 
-```text
-Password: Hh74RPnuQ9sa5JAEXgNWCqz7sXGnh5J5M9KfPg3H
-```
+- `Password:` → `Hh74RPnuQ9sa5JAEXgNWCqz7sXGnh5J5M9KfPg3H`
 
 🟨 **In the shell:**
 

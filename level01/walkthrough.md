@@ -71,11 +71,14 @@ Their names also show up on the `call ... <name>` lines inside `main`.
 run
 ```
 
-🟨 **In the program:**
+🟨 **In the program**, type only the value at each prompt (the `Enter ...:` text is printed
+by the program — don't type it):
+
+- at `Enter Username:` type `dat_wil`
+- at `Enter Password:` paste the cyclic pattern below
 
 ```text
-Enter Username: dat_wil
-Enter Password: Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad...
+Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1
 ```
 
 ⬜ **Output:**

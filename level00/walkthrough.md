@@ -87,11 +87,9 @@ So the expected password is `5276`.
 ./level00
 ```
 
-🟨 **In the program:**
+🟨 **In the program**, at the prompt type only the value (`Password:` is printed by the program):
 
-```text
-Password:5276
-```
+- `Password:` → type `5276`
 
 A shell with `level01`'s rights opens. Read the password:
 

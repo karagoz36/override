@@ -113,12 +113,10 @@ print(h & 0xffffffff)
 ./level06
 ```
 
-🟨 **In the program:**
+🟨 **In the program**, type only the value at each prompt (the `-> Enter ...:` text is printed):
 
-```text
--> Enter Login: username
--> Enter Serial: 6234463
-```
+- `-> Enter Login:` → `username`
+- `-> Enter Serial:` → `6234463`
 
 ⬜ **Output:**
 
