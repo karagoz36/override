@@ -45,9 +45,14 @@ gdb ./level07
 🟨 **GDB:**
 
 ```gdb
+info functions
 disassemble main
 disassemble store_number
 ```
+
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — that is
+how we discover `store_number`, `read_number`, `get_unum` and `clear_stdin`. Their names also
+appear on the `call ... <name>` lines inside `main`.
 
 Key facts:
 

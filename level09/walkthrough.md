@@ -51,6 +51,10 @@ disassemble set_msg
 print secret_backdoor
 ```
 
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — this is
+how we spot the hidden `secret_backdoor` (never called by the program) plus `set_username`,
+`set_msg` and `handle_msg`.
+
 Findings:
 
 - A hidden `secret_backdoor()` reads a line and runs it via `system()` — our goal is to jump

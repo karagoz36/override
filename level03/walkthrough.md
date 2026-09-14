@@ -44,10 +44,15 @@ gdb ./level03
 🟨 **GDB:**
 
 ```gdb
+info functions
 disassemble main
 disassemble test
 disassemble decrypt
 ```
+
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — that is
+how we discover `test` and `decrypt` and know to disassemble them. Their names also appear on
+the `call ... <name>` lines inside `main`.
 
 Reconstructing the flow:
 

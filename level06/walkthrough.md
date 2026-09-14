@@ -44,9 +44,14 @@ gdb ./level06
 🟨 **GDB:**
 
 ```gdb
+info functions
 disassemble main
 disassemble auth
 ```
+
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — that is
+how we discover `auth` and know to disassemble it. Its name also appears on the
+`call ... <auth>` line inside `main`.
 
 Reconstructing `auth(login, serial)`:
 

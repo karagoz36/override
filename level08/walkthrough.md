@@ -57,8 +57,13 @@ gdb ./level08
 🟨 **GDB:**
 
 ```gdb
+info functions
 disassemble main
 ```
+
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — here it
+reveals `log_wrapper` alongside `main`. The names also appear on the `call ... <name>` lines
+inside `main`.
 
 Reconstructing `main`:
 

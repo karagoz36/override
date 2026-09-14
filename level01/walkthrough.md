@@ -45,10 +45,15 @@ gdb ./level01
 🟨 **GDB:**
 
 ```gdb
+info functions
 disassemble main
 disassemble verify_user_name
 disassemble verify_user_pass
 ```
+
+`info functions` lists the program's own functions (ignore the `@plt` libc stubs) — that
+is how we discover `verify_user_name` and `verify_user_pass` and know to disassemble them.
+Their names also show up on the `call ... <name>` lines inside `main`.
 
 - `verify_user_name` does `strncmp(a_user_name, "dat_wil", 7)` → username must be **`dat_wil`**.
 - `verify_user_pass` compares against `"admin"`, but in `main` its result is used in a
